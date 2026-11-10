@@ -1,7 +1,7 @@
 {
   "name": "Stroik – strojenie instrumentów",
   "short_name": "Stroik",
-  "description": "Stroik do gitary, skrzypiec, ukulele, fletu poprzecznego i harfy.",
+  "description": "Stroik do gitary, skrzypiec, ukulele, fletu poprzecznego i fortepianu.",
   "lang": "pl",
   "start_url": "./",
   "scope": "./",

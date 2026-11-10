@@ -67,12 +67,15 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .instr-svg { width: 100%; height: 100%; max-width: 520px; display: block; overflow: visible; }
 .peg { cursor: pointer; outline: none; }
 .peg .hit { fill: transparent; }
-.peg .tag-bg { fill: var(--panel); stroke: rgba(255, 255, 255, .35); stroke-width: 1.5; transition: fill .2s, stroke .2s; }
-.peg .tag-txt { fill: var(--ink); font-family: Georgia, "Times New Roman", serif; font-weight: 700; text-anchor: middle; dominant-baseline: central; }
+.peg .tag-bg { fill: url(#medal); stroke: #c9a24c; stroke-width: 2; transition: fill .2s, stroke .2s; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .5)); }
+.peg .tag-ring { fill: none; stroke: #8c1c33; stroke-width: .8; opacity: .55; }
+.peg .leader { stroke: #c9a24c; stroke-width: 1; stroke-dasharray: 2 3; fill: none; opacity: .8; }
+.peg .tag-txt { fill: #5a1426; font-family: Georgia, "Times New Roman", serif; font-weight: 700; text-anchor: middle; dominant-baseline: central; }
 .peg .tag-sub { fill: var(--muted); font-size: 12px; text-anchor: middle; }
 .peg .peg-body { transition: filter .2s; }
 .peg.active .tag-bg { fill: var(--active); stroke: #fff; }
 .peg.active .tag-txt { fill: #3a0e1b; }
+.peg.active .leader { stroke: var(--active); opacity: 1; stroke-dasharray: none; }
 .peg.active .peg-body { filter: url(#glow) drop-shadow(0 0 6px var(--active)); }
 .peg.tuned .tag-bg { fill: var(--ok); stroke: #eafff1; }
 .peg.tuned .tag-txt { fill: #0d3a1f; }

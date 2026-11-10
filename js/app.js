@@ -1,7 +1,7 @@
 // Stroik – logika aplikacji: mikrofon, rozpoznawanie struny, wskaźnik, dźwięki.
 (() => {
   'use strict';
-  const { INSTRUMENTS, DRAWINGS, noteName, freqOf, detectPitch } = window.Tuner;
+  const { INSTRUMENTS, DRAWINGS, meterSVG, fullName, freqOf, detectPitch } = window.Tuner;
   const $ = (id) => document.getElementById(id);
   const STORE = 'tune-stroik-state';
 
@@ -25,9 +25,10 @@
   const heardEl = $('heard-hz');
   const statusEl = $('status');
   const micBtn = $('btn-mic');
-  let needle = null;
-  let meterCents = null;
-  let half = 100;
+  $('meter-box').innerHTML = meterSVG();
+  const needle = $('needle');
+  const meterCents = $('meter-cents');
+  const half = +$('meter').dataset.half;
 
   // ---------- wybór instrumentu ----------
   const chips = $('chips');
@@ -49,9 +50,6 @@
     chips.querySelector('.on')?.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
     stage.innerHTML = DRAWINGS[state.inst](inst());
     stage.dataset.inst = state.inst;
-    needle = $('needle');
-    meterCents = $('meter-cents');
-    half = +$('meter').dataset.half;
     paintPegs();
     showIdle();
   }
@@ -68,7 +66,7 @@
 
   function showTarget(i) {
     const m = inst().strings[i];
-    noteEl.textContent = noteName(m);
+    noteEl.textContent = fullName(m);
     targetEl.textContent = `cel ${fmtHz(freqOf(m, state.a4))} Hz`;
   }
   const fmtHz = (f) => f.toFixed(1).replace('.', ',');
@@ -326,7 +324,7 @@
       lastAnalysis = now;
       analyse(now);
     }
-    if (needle) {
+    {
       shownCents += (targetCents - shownCents) * 0.22;
       needle.setAttribute('transform', `translate(${((shownCents / 50) * half).toFixed(1)} 0)`);
       const ok = needleVisible && Math.abs(targetCents) <= 5;

@@ -1,14 +1,14 @@
 # Stroik
 
-Stroik do instrumentów na telefon (PWA): **gitara, skrzypce, ukulele, flet poprzeczny, harfa**.
+Stroik do instrumentów na telefon (PWA): **gitara, skrzypce, ukulele, flet poprzeczny, fortepian**.
 
 ## Jak działa
 
-- Na ekranie widać fragment instrumentu (główkę z kołkami, ślimak skrzypiec, główkę fletu z ustnikiem, szyję harfy).
+- Na ekranie widać fragment instrumentu (główkę z kołkami, ślimak skrzypiec, pionową główkę fletu z ustnikiem, klawiaturę fortepianu).
 - Po włączeniu mikrofonu aplikacja **sama rozpoznaje strojoną strunę** – jej kołek i struna są podświetlone.
-- Wskaźnik na instrumencie przesuwa się w lewo (za nisko) lub w prawo (za wysoko); zielone pole = ±5 centów.
+- Wskaźnik nad instrumentem przesuwa się w lewo (za nisko) lub w prawo (za wysoko); zielone pole = ±5 centów.
 - Gdy dźwięk utrzyma się w stroju ~0,6 s: kołek robi się **zielony** i słychać krótki akord („dźwięk zgody”). Pozostałe struny zostają neutralne.
-- **Stuknięcie kołka** (lub nazwy dźwięku) odtwarza dźwięk wzorcowy; ponowne stuknięcie go zatrzymuje.
+- **Stuknięcie kołka** (lub klawisza, przycisku a¹/a² fletu) odtwarza dźwięk wzorcowy; ponowne stuknięcie go zatrzymuje.
 - **Ustawienia** (⚙): częstotliwość a¹ (415–466 Hz, domyślnie 440), automatyczne rozpoznawanie struny, dźwięk po nastrojeniu, kasowanie zielonych oznaczeń.
 
 | Instrument | Dźwięki (notacja polska) |
@@ -17,9 +17,9 @@ Stroik do instrumentów na telefon (PWA): **gitara, skrzypce, ukulele, flet popr
 | Skrzypce | g d¹ a¹ e² |
 | Ukulele | g¹ c¹ e¹ a¹ |
 | Flet poprzeczny | a¹, a² |
-| Harfa | kolejne dźwięki od A do c² (struny c czerwone, f niebieskie) |
+| Fortepian | wszystkie dźwięki od A do c² (z półtonami, np. cis/des) |
 
-Listę instrumentów i dźwięków zmienia się w `js/instruments.js` (np. zakres harfy: `diatonic(45, 72)`; numery MIDI, 69 = a¹).
+Listę instrumentów i dźwięków zmienia się w `js/instruments.js` (np. zakres fortepianu: `range(45, 72)`; numery MIDI, 69 = a¹).
 
 ## Aplikacja na telefon
 

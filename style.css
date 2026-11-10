@@ -54,7 +54,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 
 /* ---------- odczyt ---------- */
 .readout { text-align: center; flex: none; padding: 0 16px; }
-.note { font-size: 2.6rem; font-weight: 700; line-height: 1.05; font-family: Georgia, "Times New Roman", serif; }
+.note { font-size: 2.3rem; font-weight: 700; line-height: 1.05; font-family: Georgia, "Times New Roman", serif; }
 .sub { display: flex; justify-content: center; gap: 14px; font-size: .85rem; color: var(--muted); min-height: 1.2em; }
 .status { margin-top: 4px; font-size: 1rem; min-height: 1.4em; color: var(--muted); transition: color .2s; }
 .status.ok { color: var(--ok); font-weight: 700; }
@@ -83,26 +83,41 @@ button { font: inherit; color: inherit; cursor: pointer; }
 @keyframes playing { to { stroke: #fff; stroke-width: 5; } }
 @keyframes pop { 40% { transform: scale(1.35); } }
 
-.str { stroke: #d8d2c6; fill: none; opacity: .8; transition: stroke .2s, opacity .2s; }
-.str-c { stroke: #d6383e; }
-.str-f { stroke: #2b3b8f; }
-.str.active { stroke: var(--active); opacity: 1; filter: drop-shadow(0 0 3px var(--active)); }
-.str.tuned { stroke: var(--ok); opacity: 1; }
+.str .str-line { transition: stroke .2s; }
+.str.active .str-line, path.str.active { stroke: var(--active); filter: drop-shadow(0 0 3px var(--active)); }
+.str.tuned .str-line, path.str.tuned { stroke: var(--ok); }
 .draw-note { fill: var(--muted); font-size: 13px; text-anchor: middle; }
 
-/* wskaźnik */
-.meter-bg { fill: rgba(30, 6, 12, .82); stroke: rgba(232, 196, 122, .45); stroke-width: 1.5; }
-.meter-ok { fill: rgba(78, 224, 138, .22); }
+/* wskaźnik (pasek nad instrumentem) */
+.meter-box { flex: none; padding: 6px 12px 0; display: flex; justify-content: center; }
+.meter-svg { width: 100%; max-width: 480px; display: block; }
+.meter-bg { fill: rgba(22, 4, 9, .85); stroke: rgba(232, 196, 122, .45); stroke-width: 1.5; }
+.meter-ok { fill: rgba(78, 224, 138, .28); }
 .tick { stroke: rgba(255, 255, 255, .45); stroke-width: 1.5; }
-.tick.major { stroke: rgba(255, 255, 255, .85); stroke-width: 2; }
+.tick.major { stroke: rgba(255, 255, 255, .9); stroke-width: 2; }
 .tick.base { stroke: rgba(255, 255, 255, .35); }
-.meter-lbl { fill: var(--muted); font-size: 11px; text-anchor: middle; }
+.meter-num { fill: var(--muted); font-size: 10px; text-anchor: middle; }
+.meter-lbl { fill: var(--muted); font-size: 18px; }
 .meter-cents { fill: var(--ink); font-size: 13px; font-weight: 700; text-anchor: middle; }
-.needle line { stroke: var(--gold); stroke-width: 4; stroke-linecap: round; }
-.needle circle { fill: var(--gold); }
-.needle.ok line { stroke: var(--ok); }
-.needle.ok circle { fill: var(--ok); }
+.needle path, .needle circle { fill: var(--gold); transition: fill .2s; }
+.needle.ok path, .needle.ok circle { fill: var(--ok); }
 .needle.dim { opacity: .35; }
+
+/* fortepian */
+.peg.key .key-face { transition: fill .15s; }
+.peg.key .key-txt { font-family: Georgia, "Times New Roman", serif; font-weight: 700; text-anchor: middle; font-size: 13px; fill: #5a1426; }
+.peg.key.black .key-txt { fill: #e8dcc8; font-size: 10px; font-weight: 400; }
+.peg.key.white.active .key-face { fill: #ffe08a; }
+.peg.key.black.active .key-face { fill: #c9901e; }
+.peg.key.tuned .key-face { fill: #8eeab3; }
+.peg.key.black.tuned .key-face { fill: #1f9a55; }
+.peg.key.playing .key-face { animation: keyplay .8s ease-in-out infinite alternate; }
+@keyframes keyplay { to { stroke: #ffd27a; stroke-width: 4; } }
+
+/* flet */
+.flute-hint path { stroke: var(--gold); stroke-width: 3; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.flute-hint text { fill: var(--ink); font-size: 14px; }
+.flute-hint text.small { fill: var(--muted); font-size: 12px; }
 
 /* ---------- dolny pasek ---------- */
 .bottombar { flex: none; text-align: center; padding: 8px 16px calc(10px + env(safe-area-inset-bottom)); }

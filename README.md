@@ -4,7 +4,7 @@ Stroik do instrumentów na telefon (PWA): **gitara, skrzypce, ukulele, flet popr
 
 ## Jak działa
 
-- Na ekranie widać fragment instrumentu stylizowanego na dawny egzemplarz: romantyczną gitarę klasyczną z ozdobną główką, ślimak skrzypiec z profilu, ukulele z lat 20., drewniany flet z pierścieniami z kości oraz klawiaturę fortepianu.
+- Na ekranie widać fragment instrumentu stylizowanego na dawny egzemplarz: romantyczną gitarę klasyczną z ozdobną główką, skrzypce od przodu ze ślimakiem, ukulele z lat 20., drewniany flet z pierścieniami z kości oraz klawiaturę fortepianu.
 - Po włączeniu mikrofonu aplikacja **sama rozpoznaje strojoną strunę** – jej kołek i struna są podświetlone.
 - Wskaźnik nad instrumentem przesuwa się w lewo (za nisko) lub w prawo (za wysoko); zielone pole = ±5 centów.
 - Gdy dźwięk utrzyma się w stroju ~0,6 s: kołek robi się **zielony** i słychać krótki akord („dźwięk zgody”). Pozostałe struny zostają neutralne.

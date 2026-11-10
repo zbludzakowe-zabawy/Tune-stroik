@@ -104,7 +104,7 @@
     </g>`;
 
   // struna: owijana (z fakturą) albo gładka (nylon/jelito)
-  const COL = { silver: '#dcdde0', nylon: '#efe6d0', gut: '#e6d3a6' };
+  const COL = { silver: '#dcdde0', steel: '#eceef1', nylon: '#efe6d0', gut: '#e6d3a6' };
   const string = (i, d, w, kind) => `<g class="str" data-i="${i}">
       <path d="${d}" stroke="#000" stroke-opacity=".4" stroke-width="${w + 1.2}" fill="none" transform="translate(1.5 2)"/>
       <path class="str-line" d="${d}" stroke="${COL[kind]}" stroke-width="${w}" fill="none"/>
@@ -131,6 +131,12 @@
   };
 
   // ---------------- Gitara: romantyczna gitara klasyczna, główka z wycięciami ----------------
+  // poszerzenie główki w poziomie (wokół środka x = 180) – kształty drewna rozciągamy,
+  // a okrągłe elementy (wałki, słupki, ozdoby) tylko przesuwamy, żeby się nie zniekształcały
+  const WIDE = 1.25;
+  const X = (x) => 180 + (x - 180) * WIDE;
+  const wide = (body) => `<g transform="matrix(${WIDE} 0 0 1 ${180 - 180 * WIDE} 0)">${body}</g>`;
+
   function guitar(inst) {
     const s = inst.strings; // E A d g h e¹
     const nutY = 404;
@@ -139,44 +145,46 @@
     const rollersY = [152, 222, 292];
     // [indeks struny, strona, y wałka]
     const map = [[0, -1, 0], [1, -1, 1], [2, -1, 2], [5, 1, 0], [4, 1, 1], [3, 1, 2]];
-    const nutX = [150.5, 162.1, 173.7, 186.3, 197.9, 209.5];
+    const nutX = [150.5, 162.1, 173.7, 186.3, 197.9, 209.5].map(X);
     const widths = [2.6, 2.2, 1.9, 1.9, 1.6, 1.3];
     const kinds = ['silver', 'silver', 'silver', 'nylon', 'nylon', 'nylon'];
-    const slots = [[150, 116], [194, 116]];
+    const slotW = 20;
+    const slotsX = [X(158) - slotW / 2, X(202) - slotW / 2];
     let pegs = '';
     let rollers = '';
     let strs = '';
     for (const [i, dir, r] of map) {
       const y = rollersY[r];
-      const ex = dir < 0 ? 138 + (5 * (y - 100)) / (nutY - 100) : 222 - (5 * (y - 100)) / (nutY - 100);
-      const body = `<g transform="translate(${ex} ${y}) scale(${dir < 0 ? 1 : -1} 1)">${tuner}</g>${tag(s[i], dir < 0 ? ex - 82 : ex + 82, y)}`;
-      const hx = dir < 0 ? 4 : ex;
-      pegs += peg(i, s[i], body, [hx, y - 28, dir < 0 ? ex - 4 : W - 4 - ex, 56]);
-      const sx = dir < 0 ? 158 : 202;
+      const ex = X(dir < 0 ? 138 + (5 * (y - 100)) / (nutY - 100) : 222 - (5 * (y - 100)) / (nutY - 100));
+      const body = `<g transform="translate(${ex} ${y}) scale(${dir < 0 ? 1 : -1} 1)">${tuner}</g>${tag(s[i], dir < 0 ? ex - 80 : ex + 80, y)}`;
+      const hx = dir < 0 ? 2 : ex;
+      pegs += peg(i, s[i], body, [hx, y - 28, dir < 0 ? ex - 2 : W - 2 - ex, 56]);
+      const sx = X(dir < 0 ? 158 : 202);
+      const rw = slotW + 5;
       strs += string(i, `M${nutX[i]} ${H} L${nutX[i]} ${nutY} L${sx} ${y + 6}`, widths[i], kinds[i]);
       rollers += `
-        <rect x="${sx - 10}" y="${y - 5}" width="20" height="11" rx="5" fill="url(#bone)" stroke="#8a7650" stroke-width=".6"/>
-        <path d="M${sx - 5} ${y - 4} l3 9 M${sx - 1} ${y - 4} l3 9 M${sx + 3} ${y - 4} l3 9" stroke="${COL[kinds[i]]}" stroke-width="${widths[i]}" opacity=".95"/>
-        <path d="M${sx - 5} ${y - 4} l3 9 M${sx - 1} ${y - 4} l3 9 M${sx + 3} ${y - 4} l3 9" stroke="#000" stroke-opacity=".25" stroke-width=".6" transform="translate(.8 0)"/>`;
+        <rect x="${sx - rw / 2}" y="${y - 5}" width="${rw}" height="11" rx="5" fill="url(#bone)" stroke="#8a7650" stroke-width=".6"/>
+        <path d="M${sx - 7} ${y - 4} l3 9 M${sx - 2} ${y - 4} l3 9 M${sx + 3} ${y - 4} l3 9" stroke="${COL[kinds[i]]}" stroke-width="${widths[i]}" opacity=".95"/>
+        <path d="M${sx - 7} ${y - 4} l3 9 M${sx - 2} ${y - 4} l3 9 M${sx + 3} ${y - 4} l3 9" stroke="#000" stroke-opacity=".25" stroke-width=".6" transform="translate(.8 0)"/>`;
     }
     return svg(`
       ${pegs}
-      <path d="${head}" fill="url(#rosewood)" filter="url(#shadow)"/>
-      <path d="${head}" fill="#000" filter="url(#grainV)" opacity=".75"/>
-      <path d="${head}" fill="none" stroke="#e9d6a8" stroke-width="2.5"/>
-      <path d="${head}" fill="none" stroke="#2a1206" stroke-width="1" transform="translate(0 1)" opacity=".5"/>
-      <path d="${inlay}" fill="none" stroke="#d9b25a" stroke-width="1.4"/>
-      <path d="${inlay}" fill="none" stroke="#2a1206" stroke-width=".6" transform="translate(2.5 0)" opacity=".7"/>
-      ${rosette(180, 82, 18)}
-      <path d="M180 352 l8 14 l-8 14 l-8 -14 Z" fill="url(#pearl)" stroke="#c9a24c" stroke-width=".8"/>
-      <circle cx="180" cy="342" r="2.2" fill="url(#pearl)"/><circle cx="180" cy="390" r="2.2" fill="url(#pearl)"/>
-      ${slots.map(([x, y]) => `
-        <rect x="${x}" y="${y}" width="16" height="214" rx="8" fill="url(#slot)"/>
-        <rect x="${x}" y="${y}" width="16" height="214" rx="8" fill="none" stroke="#e9d6a8" stroke-width="1.2" opacity=".85"/>`).join('')}
+      ${wide(`
+        <path d="${head}" fill="url(#rosewood)" filter="url(#shadow)"/>
+        <path d="${head}" fill="#000" filter="url(#grainV)" opacity=".75"/>
+        <path d="${head}" fill="none" stroke="#e9d6a8" stroke-width="2.2"/>
+        <path d="${inlay}" fill="none" stroke="#d9b25a" stroke-width="1.2"/>
+        <path d="${inlay}" fill="none" stroke="#2a1206" stroke-width=".5" transform="translate(2 0)" opacity=".7"/>
+        <rect x="143" y="${nutY}" width="74" height="${H - nutY}" fill="url(#ebony)"/>
+        <rect x="141" y="456" width="78" height="4" rx="1.5" fill="url(#brass)"/>
+        <rect x="140" y="${nutY - 4}" width="80" height="10" rx="2.5" fill="url(#bone)" stroke="#8a7650" stroke-width=".6"/>`)}
+      ${rosette(180, 84, 20)}
+      <path d="M180 350 l9 15 l-9 15 l-9 -15 Z" fill="url(#pearl)" stroke="#c9a24c" stroke-width=".8"/>
+      <circle cx="180" cy="340" r="2.4" fill="url(#pearl)"/><circle cx="180" cy="390" r="2.4" fill="url(#pearl)"/>
+      ${slotsX.map((x) => `
+        <rect x="${x}" y="116" width="${slotW}" height="214" rx="${slotW / 2}" fill="url(#slot)"/>
+        <rect x="${x}" y="116" width="${slotW}" height="214" rx="${slotW / 2}" fill="none" stroke="#e9d6a8" stroke-width="1.2" opacity=".85"/>`).join('')}
       ${rollers}
-      <rect x="143" y="${nutY}" width="74" height="${H - nutY}" fill="url(#ebony)"/>
-      <rect x="141" y="456" width="78" height="4" rx="1.5" fill="url(#brass)"/>
-      <rect x="140" y="${nutY - 4}" width="80" height="10" rx="2.5" fill="url(#bone)" stroke="#8a7650" stroke-width=".6"/>
       ${strs}
     `);
   }
@@ -185,103 +193,121 @@
   function ukulele(inst) {
     const s = inst.strings; // g¹ c¹ e¹ a¹
     const nutY = 404;
-    const edge = (y) => 152 - (8 * (nutY - y)) / 284;
+    const edge = (y) => X(152 - (8 * (nutY - y)) / 284);
     const head = `M152 ${nutY} L145 132 C 140 116, 132 104, 134 88 C 136 70, 150 64, 158 70 C 160 52, 170 44, 180 44 C 190 44, 200 52, 202 70 C 210 64, 224 70, 226 88 C 228 104, 220 116, 215 132 L208 ${nutY} Z`;
     const inlay = `M157 ${nutY - 8} L151 136 C 146 120, 139 108, 141 92 C 143 80, 152 76, 160 82 C 163 64, 171 52, 180 52 C 189 52, 197 64, 200 82 C 208 76, 217 80, 219 92 C 221 108, 214 120, 209 136 L203 ${nutY - 8}`;
     const star = (x, y, r) => `<path d="M${x} ${y - r} L${x + r * 0.28} ${y - r * 0.28} L${x + r} ${y} L${x + r * 0.28} ${y + r * 0.28} L${x} ${y + r} L${x - r * 0.28} ${y + r * 0.28} L${x - r} ${y} L${x - r * 0.28} ${y - r * 0.28} Z" fill="url(#pearl)" stroke="#c9a24c" stroke-width=".7"/>`;
     const posts = [[0, -1, 190], [1, -1, 290], [3, 1, 190], [2, 1, 290]];
-    const nutX = [161, 173.5, 186.5, 199];
+    const nutX = [161, 173.5, 186.5, 199].map(X);
     const widths = [2, 2.6, 2.3, 1.9];
     let pegs = '';
     let tops = '';
     let strs = '';
     for (const [i, dir, y] of posts) {
       const ex = dir < 0 ? edge(y) : W - edge(y);
-      const px = dir < 0 ? ex + 17 : ex - 17;
-      const body = `<g transform="translate(${ex} ${y}) scale(${dir < 0 ? 1 : -1} 1)">${tuner}</g>${tag(s[i], dir < 0 ? ex - 82 : ex + 82, y)}`;
-      const hx = dir < 0 ? 18 : ex;
-      pegs += peg(i, s[i], body, [hx, y - 30, dir < 0 ? ex - 18 : W - 18 - ex, 60]);
+      const px = dir < 0 ? ex + 20 : ex - 20;
+      const body = `<g transform="translate(${ex} ${y}) scale(${dir < 0 ? 1 : -1} 1)">${tuner}</g>${tag(s[i], dir < 0 ? ex - 80 : ex + 80, y)}`;
+      const hx = dir < 0 ? 10 : ex;
+      pegs += peg(i, s[i], body, [hx, y - 30, dir < 0 ? ex - 10 : W - 10 - ex, 60]);
       tops += `
-        <circle cx="${px}" cy="${y}" r="9" fill="url(#brass)" stroke="#6a4810" stroke-width=".6" filter="url(#soft)"/>
-        <circle cx="${px}" cy="${y}" r="5.5" fill="url(#ivory)" stroke="#7a6038" stroke-width=".6"/>
-        <circle cx="${px}" cy="${y}" r="6.5" fill="none" stroke="${COL.gut}" stroke-width="${widths[i] + 0.6}" stroke-dasharray="12 30" transform="rotate(${dir < 0 ? 40 : 120} ${px} ${y})"/>`;
-      strs += string(i, `M${nutX[i]} ${H} L${nutX[i]} ${nutY} L${px + (nutX[i] < px ? -5 : 5)} ${y + 2}`, widths[i], 'gut');
+        <circle cx="${px}" cy="${y}" r="10" fill="url(#brass)" stroke="#6a4810" stroke-width=".6" filter="url(#soft)"/>
+        <circle cx="${px}" cy="${y}" r="6" fill="url(#ivory)" stroke="#7a6038" stroke-width=".6"/>
+        <circle cx="${px}" cy="${y}" r="7" fill="none" stroke="${COL.gut}" stroke-width="${widths[i] + 0.6}" stroke-dasharray="12 32" transform="rotate(${dir < 0 ? 40 : 120} ${px} ${y})"/>`;
+      strs += string(i, `M${nutX[i]} ${H} L${nutX[i]} ${nutY} L${px + (nutX[i] < px ? -6 : 6)} ${y + 2}`, widths[i], 'gut');
     }
     return svg(`
       ${pegs}
-      <path d="${head}" fill="url(#mahogany)" filter="url(#shadow)"/>
-      <path d="${head}" fill="#000" filter="url(#grainV)" opacity=".55"/>
-      <path d="${head}" fill="none" stroke="#e9d6a8" stroke-width="2.5"/>
-      <path d="${inlay}" fill="none" stroke="#d9b25a" stroke-width="1.3"/>
-      ${star(180, 92, 17)}
-      <circle cx="148" cy="92" r="2.5" fill="url(#pearl)"/><circle cx="212" cy="92" r="2.5" fill="url(#pearl)"/>
-      <circle cx="180" cy="128" r="3" fill="url(#pearl)"/><circle cx="180" cy="236" r="2.5" fill="url(#pearl)"/><circle cx="180" cy="346" r="2.5" fill="url(#pearl)"/>
-      <rect x="152" y="${nutY}" width="56" height="${H - nutY}" fill="url(#rosewood)"/>
-      <rect x="150" y="452" width="60" height="4" rx="1.5" fill="url(#brass)"/>
-      <rect x="149" y="${nutY - 4}" width="62" height="10" rx="2.5" fill="url(#bone)" stroke="#8a7650" stroke-width=".6"/>
+      ${wide(`
+        <path d="${head}" fill="url(#mahogany)" filter="url(#shadow)"/>
+        <path d="${head}" fill="#000" filter="url(#grainV)" opacity=".55"/>
+        <path d="${head}" fill="none" stroke="#e9d6a8" stroke-width="2.2"/>
+        <path d="${inlay}" fill="none" stroke="#d9b25a" stroke-width="1.2"/>
+        <rect x="152" y="${nutY}" width="56" height="${H - nutY}" fill="url(#rosewood)"/>
+        <rect x="150" y="452" width="60" height="4" rx="1.5" fill="url(#brass)"/>
+        <rect x="149" y="${nutY - 4}" width="62" height="10" rx="2.5" fill="url(#bone)" stroke="#8a7650" stroke-width=".6"/>`)}
+      ${star(180, 92, 19)}
+      <circle cx="${X(148)}" cy="92" r="2.6" fill="url(#pearl)"/><circle cx="${X(212)}" cy="92" r="2.6" fill="url(#pearl)"/>
+      <circle cx="180" cy="128" r="3" fill="url(#pearl)"/><circle cx="180" cy="240" r="2.6" fill="url(#pearl)"/><circle cx="180" cy="346" r="2.6" fill="url(#pearl)"/>
       ${tops}
       ${strs}
     `);
   }
 
-  // ---------------- Skrzypce: ślimak z profilu, 4 kołki ----------------
+  // ---------------- Skrzypce: widok z przodu – ślimak, skrzynka kołkowa, 4 kołki ----------------
   function violin(inst) {
     const s = inst.strings; // g d¹ a¹ e²
-    const cx = 180;
-    const cy = 98;
-    // spirala ślimaka (2,6 zwoju do „oczka”)
-    const spiral = (r0, r1, a0, turns) => {
+    const nutY = 404;
+    const nutX = [168, 176.5, 185, 193.5];
+    const widths = [2.2, 1.8, 1.4, 0.9];
+    const kinds = ['silver', 'silver', 'silver', 'steel'];
+    // [indeks, strona, y]
+    const pegsPos = [[1, -1, 214], [2, 1, 258], [0, -1, 302], [3, 1, 346]];
+    // kołek skrzypcowy: heban, kościany pierścień i główka (lokalnie: 0 = ścianka skrzynki, w lewo)
+    const vpeg = `
+      <rect x="-3" y="-4.5" width="14" height="9" fill="url(#ebony)"/>
+      <rect x="-12" y="-8" width="10" height="16" rx="3" fill="url(#ebonyR)" stroke="#000" stroke-width=".6"/>
+      <rect x="-9" y="-8" width="3" height="16" fill="url(#bone)"/>
+      <path class="peg-body" d="M-12 -6 C -24 -7, -30 -25, -50 -25 C -68 -25, -76 -13, -76 0 C -76 13, -68 25, -50 25 C -30 25, -24 7, -12 6 Z"
+        fill="url(#ebonyR)" stroke="#000" stroke-width="1"/>
+      <path d="M-50 -16 C -60 -16, -66 -9, -66 0 C -66 9, -60 16, -50 16 C -40 16, -34 9, -30 0 C -34 -9, -40 -16, -50 -16 Z" fill="none" stroke="#fff" stroke-opacity=".12" stroke-width="2"/>
+      <path d="M-24 -11 C -32 -20, -50 -22, -62 -14" stroke="#fff" stroke-opacity=".3" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <rect x="-80" y="-4" width="6" height="8" rx="2" fill="url(#ebonyR)"/>
+      <circle cx="-82" cy="0" r="5" fill="url(#ivory)" stroke="#7a6038" stroke-width=".6"/>`;
+    const wallL = (y) => 150 + (6 * (nutY - y)) / (nutY - 170);
+    let pegs = '';
+    let shafts = '';
+    let strs = '';
+    for (const [i, dir, y] of pegsPos) {
+      const ex = dir < 0 ? wallL(y) : W - wallL(y);
+      const body = `<g transform="translate(${ex} ${y}) scale(${dir < 0 ? 1 : -1} 1)">${vpeg}</g>${tag(s[i], dir < 0 ? ex - 112 : ex + 112, y)}`;
+      const hx = dir < 0 ? 4 : ex;
+      pegs += peg(i, s[i], body, [hx, y - 28, dir < 0 ? ex - 4 : W - 4 - ex, 56]);
+      const wx = 180 + dir * 5;
+      shafts += `<rect x="164" y="${y - 4.5}" width="32" height="9" fill="url(#ebony)"/>
+        <ellipse cx="${wx}" cy="${y}" rx="6.5" ry="6" fill="none" stroke="${COL[kinds[i]]}" stroke-width="${widths[i] + 1.8}"/>
+        <ellipse cx="${wx}" cy="${y}" rx="6.5" ry="6" fill="none" stroke="#000" stroke-opacity=".3" stroke-width="${widths[i] + 1.8}" stroke-dasharray=".8 1.2"/>`;
+      strs += string(i, `M${nutX[i]} ${H} L${nutX[i]} ${nutY} L${wx} ${y + 6}`, widths[i], kinds[i]);
+    }
+    // obrys: skrzynka kołkowa + ślimak widziany z przodu (z „uszami” zwojów po bokach)
+    const box = `M150 ${nutY + 2} L157 176 C 156 166, 158 158, 162 152 C 146 150, 132 138, 132 120 C 132 102, 144 92, 156 92 C 154 68, 164 46, 180 44 C 196 46, 206 68, 204 92 C 216 92, 228 102, 228 120 C 228 138, 214 150, 198 152 C 202 158, 204 166, 203 176 L210 ${nutY + 2} Z`;
+    const spiral = (cx, cy, r0, r1, turns, dir, a0) => {
       const pts = [];
-      const steps = Math.round(turns * 48);
+      const steps = Math.round(turns * 40);
       for (let k = 0; k <= steps; k++) {
         const t = k / steps;
-        const a = ((a0 - t * turns * 360) * Math.PI) / 180;
+        const a = ((a0 + dir * t * turns * 360) * Math.PI) / 180;
         const r = r0 + (r1 - r0) * t;
         pts.push(`${(cx + r * Math.cos(a)).toFixed(1)} ${(cy + r * Math.sin(a)).toFixed(1)}`);
       }
       return 'M' + pts.join(' L');
     };
-    const head = `M150 ${H} L150 168 C 136 154, 126 128, 128 100 C 130 66, 154 46, 182 46 C 212 46, 234 70, 234 100 C 234 126, 220 144, 208 156 C 203 162, 202 170, 202 182 C 200 260, 198 330, 198 ${H} Z`;
-    // [indeks, bliższy?, y, kąt]
-    const pegsPos = [[1, true, 194, -28], [2, false, 236, 0], [0, true, 278, 22], [3, false, 320, 0]];
-    let pegs = '';
-    for (const [i, near, y, ang] of pegsPos) {
-      const x = 176;
-      const lx = 312;
-      let body;
-      if (near) {
-        body = `
-          <g transform="translate(${x} ${y}) rotate(${ang})" filter="url(#soft)">
-            <path class="peg-body" d="M-38 -9 C -44 -9, -44 9, -38 9 C -24 9, -16 4, 0 4 C 16 4, 24 9, 38 9 C 44 9, 44 -9, 38 -9 C 24 -9, 16 -4, 0 -4 C -16 -4, -24 -9, -38 -9 Z" fill="url(#ebonyR)" stroke="#000" stroke-width="1"/>
-            <path d="M-36 -6 C -24 -6, -16 -2, 0 -2 C 16 -2, 24 -6, 36 -6" stroke="#fff" stroke-opacity=".28" stroke-width="1.5" fill="none"/>
-          </g>
-          <circle cx="${x}" cy="${y}" r="10" fill="url(#ebonyR)" stroke="#000"/>
-          <circle cx="${x}" cy="${y}" r="7.5" fill="none" stroke="url(#bone)" stroke-width="2.2"/>
-          <circle cx="${x}" cy="${y}" r="3.6" fill="url(#ivory)"/>`;
-      } else {
-        body = `
-          <circle cx="${x}" cy="${y}" r="9" fill="#2a1206" opacity=".6"/>
-          <circle class="peg-body" cx="${x}" cy="${y}" r="6.5" fill="url(#ebonyR)" stroke="#000"/>
-          <circle cx="${x - 2}" cy="${y - 2}" r="2" fill="#fff" opacity=".35"/>`;
-      }
-      body += `<path d="M${x + (near ? 30 : 12)} ${y} L${lx - 20} ${y}" class="leader"/>${tag(s[i], lx, y)}`;
-      pegs += peg(i, s[i], body, [x - 46, y - 21, lx + 20 - (x - 46), 42]);
-    }
+    const ear = (cx, dir) => `
+      <circle cx="${cx}" cy="120" r="21" fill="url(#amberR)"/>
+      <circle cx="${cx}" cy="120" r="21" fill="#000" filter="url(#flame)" opacity=".4"/>
+      <path d="${spiral(cx, 120, 19, 4, 1.8, dir, dir < 0 ? 90 : 90)}" fill="none" stroke="#2e0f02" stroke-width="2.4" stroke-linecap="round"/>
+      <path d="${spiral(cx - 0.8, 119, 17, 3, 1.8, dir, dir < 0 ? 90 : 90)}" fill="none" stroke="#ffd29a" stroke-opacity=".45" stroke-width="1.1" stroke-linecap="round"/>
+      <circle cx="${cx}" cy="120" r="4.5" fill="url(#amberR)" stroke="#2e0f02" stroke-width="1"/>`;
     return svg(`
-      <path d="${head}" fill="url(#amber)" filter="url(#shadow)"/>
-      <path d="${head}" fill="#000" filter="url(#flame)" opacity=".8"/>
-      <circle cx="${cx + 1}" cy="${cy}" r="52" fill="url(#amberR)" opacity=".55"/>
-      <path d="${spiral(50, 9, 62, 2.6)}" fill="none" stroke="#2e0f02" stroke-width="3.2" stroke-linecap="round"/>
-      <path d="${spiral(47, 7, 62, 2.6)}" fill="none" stroke="#ffcf8a" stroke-opacity=".45" stroke-width="1.6" stroke-linecap="round"/>
-      <path d="${spiral(53, 12, 62, 2.6)}" fill="none" stroke="#5a2408" stroke-opacity=".35" stroke-width="5" stroke-linecap="round"/>
-      <circle cx="${cx}" cy="${cy}" r="8" fill="url(#amberR)" stroke="#2e0f02" stroke-width="1.5"/>
-      <path d="${head}" fill="none" stroke="#2e0f02" stroke-width="1.4"/>
-      <path d="M150 168 L150 ${H}" stroke="#2e0f02" stroke-width="3" opacity=".6"/>
-      <path d="M134 ${H} L134 380 Q134 372 142 372 L150 372 L150 ${H} Z" fill="url(#ebony)"/>
-      <path d="M134 ${H} L134 380 Q134 372 142 372 L150 372" fill="none" stroke="#fff" stroke-opacity=".15"/>
-      <path d="M131 384 Q131 376 139 376 L150 376 L150 386 L131 386 Z" fill="url(#ebony)" stroke="#000" stroke-width=".5"/>
-      <line x1="132" y1="386" x2="132" y2="${H}" class="str" data-i="-1" stroke="#c9ccd2" stroke-width="1.4"/>
+      <path d="${box}" fill="url(#amber)" filter="url(#shadow)"/>
+      <path d="${box}" fill="#000" filter="url(#flame)" opacity=".7"/>
+      <path d="M180 50 C 166 52, 160 70, 160 92 L160 140 C 166 150, 194 150, 200 140 L200 92 C 200 70, 194 52, 180 50 Z" fill="url(#amberR)" opacity=".55"/>
+      <path d="M170 56 C 166 72, 166 110, 168 146" stroke="#2e0f02" stroke-width="2.2" fill="none" opacity=".7" stroke-linecap="round"/>
+      <path d="M190 56 C 194 72, 194 110, 192 146" stroke="#2e0f02" stroke-width="2.2" fill="none" opacity=".7" stroke-linecap="round"/>
+      <path d="M180 50 L180 148" stroke="#ffc98a" stroke-opacity=".7" stroke-width="3" stroke-linecap="round"/>
+      <path d="M168 60 C 172 52, 176 49, 180 48" stroke="#fff0d8" stroke-opacity=".6" stroke-width="2" fill="none" stroke-linecap="round"/>
+      ${ear(153, -1)}
+      ${ear(207, 1)}
+      <path d="M164 150 C 172 160, 188 160, 196 150" stroke="#2e0f02" stroke-opacity=".6" stroke-width="2" fill="none"/>
+      <path d="${box}" fill="none" stroke="#2e0f02" stroke-width="1.4"/>
+      <rect x="164" y="182" width="32" height="${nutY - 192}" rx="15" fill="#160801"/>
+      <rect x="164" y="182" width="32" height="${nutY - 192}" rx="15" fill="none" stroke="#000" stroke-width="2.5" opacity=".7"/>
+      <rect x="164.5" y="182" width="31" height="${nutY - 192}" rx="15" fill="none" stroke="#ffc27a" stroke-width=".8" opacity=".35" transform="translate(0 1.5)"/>
+      ${shafts}
       ${pegs}
+      <path d="M155 ${nutY} L205 ${nutY} L207 ${H} L153 ${H} Z" fill="url(#ebony)"/>
+      <rect x="153" y="${nutY - 4}" width="54" height="8" rx="2.5" fill="url(#ebony)" stroke="#000" stroke-width=".5"/>
+      <rect x="153" y="${nutY - 4}" width="54" height="1.6" fill="#fff" opacity=".2"/>
+      ${strs}
     `);
   }
 

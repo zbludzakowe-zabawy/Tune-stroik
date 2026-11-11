@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="Stroik do gitary, skrzypiec, ukulele, fletu poprzecznego i fortepianu – automatycznie rozpoznaje strojoną strunę.">
+  <meta name="theme-color" content="#4a1424">
+  <title>Stroik</title>
+  <meta name="application-name" content="Stroik">
+  <meta name="apple-mobile-web-app-title" content="Stroik">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <h1><img src="icons/favicon-32.png" alt="" width="22" height="22"> Stroik</h1>
+    <button class="icon-btn" id="btn-settings" aria-label="Ustawienia">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+    </button>
+  </header>
+
+  <nav class="chips" id="chips" aria-label="Instrument"></nav>
+
+  <section class="readout" aria-live="polite">
+    <div class="note" id="note">–</div>
+    <div class="sub"><span id="target-hz"></span><span id="heard-hz"></span></div>
+    <div class="status" id="status"></div>
+  </section>
+
+  <div class="meter-box" id="meter-box"></div>
+
+  <main class="stage" id="stage"></main>
+
+  <footer class="bottombar">
+    <button class="btn primary big" id="btn-mic">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+      <span>Włącz mikrofon</span>
+    </button>
+    <p class="hint">Stuknij kołek lub klawisz, aby usłyszeć dźwięk</p>
+  </footer>
+
+  <dialog id="settings" class="sheet">
+    <h2>Ustawienia</h2>
+    <div class="field">
+      <div class="field-head">Strój: a¹ = <b id="a4-val">440</b> Hz</div>
+      <div class="a4-row">
+        <button class="btn round" id="a4-minus" aria-label="Niżej o 1 Hz">−</button>
+        <input type="range" id="a4-range" min="415" max="466" step="1" value="440" aria-label="Częstotliwość a¹">
+        <button class="btn round" id="a4-plus" aria-label="Wyżej o 1 Hz">+</button>
+      </div>
+      <div class="presets">
+        <button class="btn preset" data-hz="432">432</button>
+        <button class="btn preset" data-hz="440">440</button>
+        <button class="btn preset" data-hz="442">442</button>
+        <button class="btn preset" data-hz="443">443</button>
+      </div>
+    </div>
+    <label class="switch"><input type="checkbox" id="opt-auto"><span>Automatycznie rozpoznawaj strunę</span></label>
+    <label class="switch"><input type="checkbox" id="opt-chime"><span>Dźwięk po nastrojeniu <button class="link" id="btn-test-chime" type="button">posłuchaj</button></span></label>
+    <button class="btn wide" id="btn-reset-tuned">Wyczyść oznaczenia nastrojonych strun</button>
+    <button class="btn primary wide" id="btn-close-settings">Gotowe</button>
+  </dialog>
+
+  <div class="app-banner" id="install-banner" hidden>
+    <img src="icons/icon-192.png" alt="" width="40" height="40">
+    <div class="app-banner-text">
+      <strong>Zainstaluj Stroik</strong>
+      <span class="only-prompt">Aplikacja na ekranie głównym, działa też bez internetu.</span>
+      <span class="only-ios">Stuknij <b>Udostępnij</b> <svg class="share-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12"/><path d="m8 7 4-4 4 4"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>, potem <b>Do ekranu początkowego</b>.</span>
+    </div>
+    <button class="btn primary only-prompt" id="btn-install">Zainstaluj</button>
+    <button class="banner-close" id="btn-install-close" aria-label="Nie pokazuj więcej">✕</button>
+  </div>
+  <div class="app-banner" id="update-banner" role="alert" hidden>
+    <div class="app-banner-text">
+      <strong>Dostępna nowa wersja</strong>
+      <span>Twoje ustawienia zostaną zachowane.</span>
+    </div>
+    <button class="btn primary" id="btn-update">Odśwież</button>
+    <button class="btn" id="btn-update-later">Później</button>
+  </div>
+
+  <script src="js/instruments.js"></script>
+  <script src="js/drawings.js"></script>
+  <script src="js/pitch.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/pwa.js"></script>
+</body>
+</html>

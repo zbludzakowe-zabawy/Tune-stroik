@@ -21,7 +21,7 @@ body {
   color: var(--ink);
   background: radial-gradient(120% 70% at 50% 0%, #5a1426 0%, var(--bg) 60%) fixed, var(--bg);
   display: flex; flex-direction: column;
-  height: 100dvh; overflow: hidden;
+  height: var(--app-h, 100dvh); overflow: hidden;
   user-select: none; -webkit-user-select: none;
 }
 button { font: inherit; color: inherit; cursor: pointer; }
@@ -246,7 +246,7 @@ body:not(.metro) .metro-only { display: none !important; }
   background: var(--bg2); color: var(--ink); font: inherit; outline: none; user-select: text; -webkit-user-select: text;
 }
 .tempo-pop input:focus { border-color: var(--accent2); }
-.tempo-pop ul { list-style: none; margin: 6px 0 0; padding: 0; max-height: min(300px, 45dvh); overflow-y: auto; }
+.tempo-pop ul { list-style: none; margin: 6px 0 0; padding: 0; height: min(300px, 45vh); overflow-y: auto; overscroll-behavior: contain; }
 .tempo-pop li {
   display: grid; grid-template-columns: 1fr auto; column-gap: 8px; padding: 8px 10px; border-radius: 8px; cursor: pointer;
 }

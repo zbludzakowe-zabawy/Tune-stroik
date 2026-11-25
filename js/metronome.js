@@ -22,6 +22,20 @@
   };
   const save = () => { try { localStorage.setItem(STORE, JSON.stringify(st)); } catch (e) { /* trudno */ } };
 
+  // ---------- stała wysokość ekranu ----------
+  // Wysunięta klawiatura (wpisywanie BPM, szukanie tempa) skraca okno; bez tego
+  // cały widok by się przeskalował i metronom „skakał”. Wysokość zmieniamy tylko
+  // przy obrocie / zmianie szerokości albo gdy nikt nie pisze.
+  const typing = () => document.activeElement?.matches?.('input[type="text"], input[type="search"]');
+  let lastW = innerWidth;
+  function fixHeight() {
+    if (typing() && innerWidth === lastW) return;
+    lastW = innerWidth;
+    document.documentElement.style.setProperty('--app-h', `${innerHeight}px`);
+  }
+  fixHeight();
+  addEventListener('resize', fixHeight);
+
   // ---------- przełącznik Strojenie / Metronom ----------
   const modeSwitch = $('mode-switch');
   function setMode(mode) {
@@ -106,14 +120,23 @@
           <b>${t.name}</b><span class="t-mean">${t.meaning}</span><span class="t-range">${t.from}–${top(t)}</span></li>`).join('')
       : '<li class="empty">Brak takiego tempa</li>';
   }
+  // przewija tylko samą listę (scrollIntoView przesuwał też całą stronę)
+  function showHi(center) {
+    const li = list.querySelector('.hi');
+    if (!li) return;
+    if (center) list.scrollTop = li.offsetTop - (list.clientHeight - li.offsetHeight) / 2;
+    else if (li.offsetTop < list.scrollTop) list.scrollTop = li.offsetTop;
+    else if (li.offsetTop + li.offsetHeight > list.scrollTop + list.clientHeight) list.scrollTop = li.offsetTop + li.offsetHeight - list.clientHeight;
+  }
   function openPop() {
     pop.hidden = false;
     tempoBtn.setAttribute('aria-expanded', 'true');
     search.value = '';
     hi = Math.max(0, M.TEMPOS.findIndex((t) => t.name === $('tempo-name').textContent.split('/')[0]));
     fillList();
-    list.querySelector('.hi')?.scrollIntoView({ block: 'center' });
-    search.focus();
+    showHi(true);
+    // na telefonie nie wysuwamy klawiatury od razu – lista wystarcza; pisać można po stuknięciu w pole
+    if (!matchMedia('(pointer: coarse)').matches) search.focus({ preventScroll: true });
   }
   function closePop() {
     pop.hidden = true;
@@ -131,7 +154,7 @@
       e.preventDefault();
       hi = (hi + (e.key === 'ArrowDown' ? 1 : -1) + matches.length) % Math.max(1, matches.length);
       fillList();
-      list.querySelector('.hi')?.scrollIntoView({ block: 'nearest' });
+      showHi(false);
     } else if (e.key === 'Enter') {
       e.preventDefault();
       if (matches[hi]) choose(matches[hi].name);

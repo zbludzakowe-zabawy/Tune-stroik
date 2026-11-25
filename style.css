@@ -215,16 +215,20 @@ body:not(.metro) .metro-only { display: none !important; }
 /* ---------- metronom ---------- */
 .metro { flex: 1; min-height: 0; display: flex; flex-direction: column; }
 .metro-readout { padding-top: 6px; }
-/* tempo w BPM – najważniejsza informacja; pole do wpisania z klawiatury */
-.bpm-big { display: inline-flex; align-items: baseline; justify-content: center; gap: 6px; cursor: text; }
+/* tempo w BPM – najważniejsza informacja; obok metronomu, pole do wpisania z klawiatury */
+.metro-stage { position: relative; }
+.bpm-big {
+  position: absolute; left: 0; top: 0; transform: translate(-100%, -100%);
+  display: block; cursor: text; z-index: 2;
+}
 .bpm-big input {
-  width: 3.2ch; padding: 0 2px; border: 0; border-bottom: 2px dashed rgba(232, 196, 122, .35); border-radius: 0;
-  background: transparent; color: var(--gold); text-align: center; outline: none;
-  font: 700 3.4rem/1 Georgia, "Times New Roman", serif; font-variant-numeric: tabular-nums;
+  display: block; width: 3.1ch; padding: 0 2px; border: 0; border-bottom: 2px dashed rgba(232, 196, 122, .35); border-radius: 0;
+  background: transparent; color: var(--gold); text-align: right; outline: none;
+  font: 700 2.9rem/1 Georgia, "Times New Roman", serif; font-variant-numeric: tabular-nums;
   user-select: text; -webkit-user-select: text;
 }
 .bpm-big input:focus { border-bottom: 2px solid var(--gold); background: rgba(232, 196, 122, .08); border-radius: 8px 8px 0 0; }
-.bpm-big span { color: var(--muted); font-size: 1rem; letter-spacing: .06em; }
+.bpm-big span { position: absolute; right: 2px; top: calc(100% + 4px); color: var(--muted); font-size: .95rem; letter-spacing: .08em; }
 
 /* nazwa tempa – lista rozwijana z wyszukiwaniem */
 .tempo-pick { position: relative; display: inline-block; margin-top: 2px; }
@@ -246,7 +250,16 @@ body:not(.metro) .metro-only { display: none !important; }
   background: var(--bg2); color: var(--ink); font: inherit; outline: none; user-select: text; -webkit-user-select: text;
 }
 .tempo-pop input:focus { border-color: var(--accent2); }
-.tempo-pop ul { list-style: none; margin: 6px 0 0; padding: 0; height: min(300px, 45vh); overflow-y: auto; overscroll-behavior: contain; }
+.tempo-pop ul {
+  list-style: none; margin: 6px 0 0; padding: 0 4px 0 0; height: min(320px, 55vh); overflow-y: auto; overscroll-behavior: contain;
+  scrollbar-width: thin; scrollbar-color: var(--gold) rgba(255, 255, 255, .08);
+  /* rozmyty dół podpowiada, że lista przewija się dalej */
+  -webkit-mask-image: linear-gradient(#000 calc(100% - 28px), transparent); mask-image: linear-gradient(#000 calc(100% - 28px), transparent);
+}
+.tempo-pop ul::-webkit-scrollbar { width: 6px; }
+.tempo-pop ul::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 3px; }
+.tempo-pop ul::-webkit-scrollbar-track { background: rgba(255, 255, 255, .08); border-radius: 3px; }
+.tempo-pop ul li:last-child { margin-bottom: 20px; }
 .tempo-pop li {
   display: grid; grid-template-columns: 1fr auto; column-gap: 8px; padding: 8px 10px; border-radius: 8px; cursor: pointer;
 }
@@ -299,6 +312,6 @@ body:not(.metro) .metro-only { display: none !important; }
 #btn-metro svg path { fill: currentColor; stroke: none; }
 #btn-metro.on { background: var(--panel2); border: 1px solid var(--accent2); }
 @media (max-height: 640px) {
-  .bpm-big input { font-size: 2.6rem; }
+  .bpm-big input { font-size: 2.3rem; }
   .play-btn { width: 60px; height: 60px; }
 }

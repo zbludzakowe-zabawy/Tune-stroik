@@ -99,10 +99,6 @@
   <!-- ---------- metronom (niezależny od stroika) ---------- -->
   <div class="metro metro-only" id="metro">
     <section class="readout metro-readout">
-      <label class="bpm-big">
-        <input id="bpm-input" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" autocomplete="off" value="120" aria-label="Tempo w BPM – wpisz liczbę">
-        <span>BPM</span>
-      </label>
       <div class="tempo-pick" id="tempo-pick">
         <button class="tempo-btn" id="tempo-btn" type="button" aria-haspopup="listbox" aria-expanded="false">
           <span id="tempo-name">Allegro</span>
@@ -115,7 +111,13 @@
       </div>
       <div class="beat-dots" id="beat-dots" aria-hidden="true"></div>
     </section>
-    <main class="stage metro-stage" id="metro-stage"></main>
+    <main class="stage metro-stage" id="metro-stage">
+      <!-- tempo w BPM obok metronomu, na wysokości „20” na skali; pole do wpisania z klawiatury -->
+      <label class="bpm-big" id="bpm-big">
+        <input id="bpm-input" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" autocomplete="off" value="120" aria-label="Tempo w BPM – wpisz liczbę">
+        <span>BPM</span>
+      </label>
+    </main>
     <section class="metro-controls">
       <div class="bpm-row">
         <button class="btn round" id="bpm-minus" aria-label="Wolniej o 1 BPM">−</button>

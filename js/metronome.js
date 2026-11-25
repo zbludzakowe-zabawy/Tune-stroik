@@ -43,6 +43,7 @@
     document.body.classList.toggle('metro', mode === 'metro');
     modeSwitch.querySelectorAll('button').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.mode === mode)));
     if (mode === 'metro') {
+      requestAnimationFrame(placeBpm);
       // mikrofon stroika nie jest potrzebny – wyłączamy go jego własnym przyciskiem
       const mic = $('btn-mic');
       if (mic?.classList.contains('on')) mic.click();
@@ -66,7 +67,7 @@
   };
   const scaleMarks = [20, 30, 40, 60, 80, 100, 120, 160, 200, 300];
   const stage = $('metro-stage');
-  stage.innerHTML = `
+  stage.insertAdjacentHTML('beforeend', `
     <svg class="metro-svg" viewBox="0 0 300 370" role="img" aria-label="Metronom">
       <defs>
         <linearGradient id="m-wood" x1="0" x2="1">
@@ -91,9 +92,21 @@
         <path class="m-weight" id="m-weight" d=""/>
       </g>
       <circle class="m-pivot" cx="${PIVOT.x}" cy="${PIVOT.y}" r="9"/>
-    </svg>`;
+    </svg>`);
   const pendulum = $('m-pendulum');
   const weight = $('m-weight');
+  // liczba BPM: prawy dolny róg przy lewej krawędzi obudowy, na wysokości „20” na skali
+  const svgEl = stage.querySelector('.metro-svg');
+  const bpmBig = $('bpm-big');
+  function placeBpm() {
+    const ctm = svgEl.getScreenCTM();
+    if (!ctm) return;
+    const p = new DOMPoint(92, weightY(M.MIN_BPM) + 4).matrixTransform(ctm);
+    const s = stage.getBoundingClientRect();
+    bpmBig.style.left = `${Math.max(p.x - s.left, bpmBig.offsetWidth + 4)}px`;
+    bpmBig.style.top = `${p.y - s.top}px`;
+  }
+  new ResizeObserver(placeBpm).observe(stage);
   const setAngle = (deg) => pendulum.setAttribute('transform', `rotate(${deg.toFixed(2)} ${PIVOT.x} ${PIVOT.y})`);
 
   // ---------- wybór tempa: lista rozwijana z wyszukiwaniem ----------

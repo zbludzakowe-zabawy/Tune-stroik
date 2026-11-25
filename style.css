@@ -218,17 +218,17 @@ body:not(.metro) .metro-only { display: none !important; }
 /* tempo w BPM – najważniejsza informacja; obok metronomu, pole do wpisania z klawiatury */
 .metro-stage { position: relative; }
 .bpm-big {
-  position: absolute; left: 0; top: 0; transform: translate(-100%, -100%);
+  position: absolute; left: 0; top: 0; transform: translateY(-100%);
   display: block; cursor: text; z-index: 2;
 }
 .bpm-big input {
   display: block; width: 3.1ch; padding: 0 2px; border: 0; border-bottom: 2px dashed rgba(232, 196, 122, .35); border-radius: 0;
-  background: transparent; color: var(--gold); text-align: right; outline: none;
+  background: transparent; color: var(--gold); text-align: left; outline: none;
   font: 700 2.9rem/1 Georgia, "Times New Roman", serif; font-variant-numeric: tabular-nums;
   user-select: text; -webkit-user-select: text;
 }
 .bpm-big input:focus { border-bottom: 2px solid var(--gold); background: rgba(232, 196, 122, .08); border-radius: 8px 8px 0 0; }
-.bpm-big span { position: absolute; right: 2px; top: calc(100% + 4px); color: var(--muted); font-size: .95rem; letter-spacing: .08em; }
+.bpm-big span { position: absolute; left: 2px; top: calc(100% + 4px); color: var(--muted); font-size: .95rem; letter-spacing: .08em; }
 
 /* nazwa tempa – lista rozwijana z wyszukiwaniem */
 .tempo-pick { position: relative; display: inline-block; margin-top: 2px; }

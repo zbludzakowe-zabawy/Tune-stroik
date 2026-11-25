@@ -103,10 +103,14 @@
     if (!ctm) return;
     const p = new DOMPoint(92, weightY(M.MIN_BPM) + 4).matrixTransform(ctm);
     const s = stage.getBoundingClientRect();
-    bpmBig.style.left = `${Math.max(p.x - s.left, bpmBig.offsetWidth + 4)}px`;
+    // lewa krawędź jak napis „Akcent” pod spodem; gdy brak miejsca – tuż przy obudowie
+    const lbl = document.querySelector('.metro-controls .opt-lbl').getBoundingClientRect();
+    const left = Math.min(lbl.left - s.left, p.x - s.left - bpmBig.offsetWidth);
+    bpmBig.style.left = `${Math.max(4, left)}px`;
     bpmBig.style.top = `${p.y - s.top}px`;
   }
   new ResizeObserver(placeBpm).observe(stage);
+  addEventListener('resize', placeBpm);
   const setAngle = (deg) => pendulum.setAttribute('transform', `rotate(${deg.toFixed(2)} ${PIVOT.x} ${PIVOT.y})`);
 
   // ---------- wybór tempa: lista rozwijana z wyszukiwaniem ----------

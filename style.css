@@ -193,3 +193,70 @@ button { font: inherit; color: inherit; cursor: pointer; }
   .hint { display: none; }
   .btn.big { padding: 10px 22px; }
 }
+
+/* ---------- przełącznik Strojenie / Metronom ---------- */
+.mode-switch {
+  display: flex; padding: 3px; border-radius: 999px; gap: 2px;
+  background: var(--bg2); border: 1px solid rgba(255, 255, 255, .14);
+}
+.mode-switch button {
+  border: 0; background: transparent; color: var(--muted);
+  padding: 6px 12px; border-radius: 999px; font-size: .85rem;
+}
+.mode-switch button[aria-selected="true"] { background: var(--accent2); color: #fff; box-shadow: 0 2px 8px rgba(179, 48, 79, .5); }
+body.metro .tuner-only { display: none !important; }
+body.metro .tuner-only-v { visibility: hidden; }
+body:not(.metro) .metro-only { display: none !important; }
+@media (max-width: 370px) {
+  .topbar h1 { font-size: 1rem; }
+  .mode-switch button { padding: 6px 9px; font-size: .8rem; }
+}
+
+/* ---------- metronom ---------- */
+.metro { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.bpm { color: var(--muted); font-size: .95rem; }
+.bpm b { color: var(--gold); font-size: 1.6rem; font-variant-numeric: tabular-nums; }
+.beat-dots { display: flex; justify-content: center; gap: 8px; height: 18px; align-items: center; margin-top: 4px; }
+.beat-dots i { width: 10px; height: 10px; border-radius: 50%; background: rgba(255, 255, 255, .18); transition: background .1s, transform .1s; }
+.beat-dots i.acc { width: 14px; height: 14px; }
+.beat-dots i.on { background: var(--muted); }
+.beat-dots i.hit { background: var(--active); transform: scale(1.25); box-shadow: 0 0 8px var(--active); }
+.beat-dots i.acc.hit { background: var(--high); box-shadow: 0 0 10px var(--high); }
+
+.metro-stage { padding-top: 6px; }
+.metro-svg { height: 100%; width: 100%; max-width: 360px; display: block; overflow: visible; }
+.m-base { fill: #1c060c; stroke: #c9a24c; stroke-width: 1.5; }
+.m-body { fill: url(#m-wood); stroke: #c9a24c; stroke-width: 2; filter: drop-shadow(0 6px 10px rgba(0, 0, 0, .5)); }
+.m-face { fill: url(#m-face); stroke: #a87b2e; stroke-width: 1; }
+.m-scale line { stroke: #5a1426; stroke-width: 1.2; }
+.m-scale text { fill: #5a1426; font-size: 9px; text-anchor: end; dominant-baseline: central; font-family: Georgia, "Times New Roman", serif; }
+.m-rod { stroke: #e8c47a; stroke-width: 4; stroke-linecap: round; }
+.m-weight { fill: url(#m-gold); stroke: #7a5418; stroke-width: 1; filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .45)); transition: d .15s; }
+.m-pivot { fill: url(#m-gold); stroke: #7a5418; stroke-width: 1; }
+.m-pendulum { transition: none; }
+.m-pendulum.rest { transition: transform .4s ease; }
+
+.metro-controls { flex: none; padding: 4px 16px 0; width: 100%; max-width: 520px; margin: 0 auto; display: flex; flex-direction: column; gap: 8px; }
+.bpm-row { display: flex; align-items: center; gap: 10px; }
+.bpm-row input { flex: 1; accent-color: var(--accent2); }
+.opt-row { display: flex; align-items: center; gap: 8px; }
+.opt-lbl { color: var(--muted); font-size: .85rem; flex: none; min-width: 66px; }
+.seg { flex: 1; display: flex; gap: 4px; }
+.seg button {
+  flex: 1; min-width: 0; height: 36px; border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, .18); background: var(--bg2); color: var(--muted);
+}
+.seg button.on { background: var(--accent2); border-color: transparent; color: #fff; font-weight: 700; }
+.btn.round.small { width: 36px; height: 36px; font-size: 1.1rem; }
+.btn:disabled { opacity: .35; }
+.sub-val { min-width: 2ch; text-align: center; color: var(--gold); font-size: 1.15rem; font-variant-numeric: tabular-nums; }
+.opt-note { color: var(--muted); font-size: .8rem; }
+#btn-metro .ico-stop { display: none; }
+#btn-metro.on .ico-play { display: none; }
+#btn-metro.on .ico-stop { display: inline; }
+#btn-metro svg path { fill: currentColor; stroke: none; }
+#btn-metro.on { background: var(--panel2); border: 1px solid var(--accent2); }
+@media (max-height: 640px) {
+  .metro .note { font-size: 1.7rem; }
+  .bpm b { font-size: 1.3rem; }
+}

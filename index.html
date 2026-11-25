@@ -67,30 +67,81 @@
 <body>
   <header class="topbar">
     <h1><img src="icons/favicon-32.png" alt="" width="22" height="22"> Stroik</h1>
-    <button class="icon-btn" id="btn-settings" aria-label="Ustawienia">
+    <div class="mode-switch" id="mode-switch" role="tablist" aria-label="Tryb">
+      <button role="tab" data-mode="tuner" aria-selected="true">Strojenie</button>
+      <button role="tab" data-mode="metro" aria-selected="false">Metronom</button>
+    </div>
+    <button class="icon-btn tuner-only-v" id="btn-settings" aria-label="Ustawienia">
       <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
     </button>
   </header>
 
-  <nav class="chips" id="chips" aria-label="Instrument"></nav>
+  <nav class="chips tuner-only" id="chips" aria-label="Instrument"></nav>
 
-  <section class="readout" aria-live="polite">
+  <section class="readout tuner-only" aria-live="polite">
     <div class="note" id="note">–</div>
     <div class="sub"><span id="target-hz"></span><span id="heard-hz"></span></div>
     <div class="status" id="status"></div>
   </section>
 
-  <div class="meter-box" id="meter-box"></div>
+  <div class="meter-box tuner-only" id="meter-box"></div>
 
-  <main class="stage" id="stage"></main>
+  <main class="stage tuner-only" id="stage"></main>
 
-  <footer class="bottombar">
+  <footer class="bottombar tuner-only">
     <button class="btn primary big" id="btn-mic">
       <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
       <span>Włącz mikrofon</span>
     </button>
     <p class="hint">Stuknij kołek lub klawisz, aby usłyszeć dźwięk</p>
   </footer>
+
+  <!-- ---------- metronom (niezależny od stroika) ---------- -->
+  <div class="metro metro-only" id="metro">
+    <section class="readout metro-readout">
+      <div class="tempo-pick" id="tempo-pick">
+        <button class="tempo-btn" id="tempo-btn" type="button" aria-haspopup="listbox" aria-expanded="false">
+          <span id="tempo-name">Allegro</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="tempo-pop" id="tempo-pop" hidden>
+          <input id="tempo-search" type="search" placeholder="Wpisz nazwę, np. lento" autocomplete="off" aria-label="Szukaj tempa">
+          <ul id="tempo-list" role="listbox" aria-label="Oznaczenia tempa"></ul>
+        </div>
+      </div>
+      <div class="beat-dots" id="beat-dots" aria-hidden="true"></div>
+    </section>
+    <main class="stage metro-stage" id="metro-stage">
+      <!-- tempo w BPM obok metronomu, na wysokości „20” na skali; pole do wpisania z klawiatury -->
+      <label class="bpm-big" id="bpm-big">
+        <input id="bpm-input" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" autocomplete="off" value="120" aria-label="Tempo w BPM – wpisz liczbę">
+        <span>BPM</span>
+      </label>
+    </main>
+    <section class="metro-controls">
+      <div class="bpm-row">
+        <button class="btn round" id="bpm-minus" aria-label="Wolniej o 1 BPM">−</button>
+        <input type="range" id="bpm-range" min="20" max="300" step="1" value="120" aria-label="Tempo w BPM">
+        <button class="btn round" id="bpm-plus" aria-label="Szybciej o 1 BPM">+</button>
+      </div>
+      <div class="opt-row">
+        <span class="opt-lbl">Akcent</span>
+        <div class="seg" id="accent-seg" role="radiogroup" aria-label="Akcent co ile uderzeń"></div>
+      </div>
+      <div class="opt-row">
+        <span class="opt-lbl">Podział</span>
+        <button class="btn round small" id="sub-minus" aria-label="Mniejszy podział">−</button>
+        <b class="sub-val" id="sub-val">1</b>
+        <button class="btn round small" id="sub-plus" aria-label="Większy podział">+</button>
+        <span class="opt-note" id="sub-note">bez podziału</span>
+      </div>
+    </section>
+    <footer class="bottombar">
+      <button class="btn primary play-btn" id="btn-metro" aria-label="Start">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path class="ico-play" d="M8 5v14l11-7z"/><path class="ico-stop" d="M7 7h10v10H7z"/></svg>
+      </button>
+    </footer>
+  </div>
 
   <dialog id="settings" class="sheet">
     <h2>Ustawienia</h2>
@@ -138,5 +189,7 @@
   <script src="js/pitch.js"></script>
   <script src="js/app.js"></script>
   <script src="js/pwa.js"></script>
+  <script src="js/tempo.js"></script>
+  <script src="js/metronome.js"></script>
 </body>
 </html>

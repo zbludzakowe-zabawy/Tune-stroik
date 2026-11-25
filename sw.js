@@ -13,6 +13,8 @@ const ASSETS = [
   './js/pitch.js',
   './js/app.js',
   './js/pwa.js',
+  './js/tempo.js',
+  './js/metronome.js',
   './manifest.webmanifest',
   './icons/icon-192.png',
   './icons/icon-512.png',

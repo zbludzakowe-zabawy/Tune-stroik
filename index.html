@@ -98,10 +98,21 @@
 
   <!-- ---------- metronom (niezależny od stroika) ---------- -->
   <div class="metro metro-only" id="metro">
-    <nav class="chips" id="tempo-chips" aria-label="Oznaczenie tempa"></nav>
-    <section class="readout">
-      <div class="note" id="tempo-name">Allegro</div>
-      <div class="bpm"><b id="bpm-val">120</b> BPM</div>
+    <section class="readout metro-readout">
+      <label class="bpm-big">
+        <input id="bpm-input" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" autocomplete="off" value="120" aria-label="Tempo w BPM – wpisz liczbę">
+        <span>BPM</span>
+      </label>
+      <div class="tempo-pick" id="tempo-pick">
+        <button class="tempo-btn" id="tempo-btn" type="button" aria-haspopup="listbox" aria-expanded="false">
+          <span id="tempo-name">Allegro</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="tempo-pop" id="tempo-pop" hidden>
+          <input id="tempo-search" type="search" placeholder="Wpisz nazwę, np. lento" autocomplete="off" aria-label="Szukaj tempa">
+          <ul id="tempo-list" role="listbox" aria-label="Oznaczenia tempa"></ul>
+        </div>
+      </div>
       <div class="beat-dots" id="beat-dots" aria-hidden="true"></div>
     </section>
     <main class="stage metro-stage" id="metro-stage"></main>
@@ -112,7 +123,7 @@
         <button class="btn round" id="bpm-plus" aria-label="Szybciej o 1 BPM">+</button>
       </div>
       <div class="opt-row">
-        <span class="opt-lbl">Akcent co</span>
+        <span class="opt-lbl">Akcent</span>
         <div class="seg" id="accent-seg" role="radiogroup" aria-label="Akcent co ile uderzeń"></div>
       </div>
       <div class="opt-row">
@@ -124,9 +135,8 @@
       </div>
     </section>
     <footer class="bottombar">
-      <button class="btn primary big" id="btn-metro">
+      <button class="btn primary play-btn" id="btn-metro" aria-label="Start">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path class="ico-play" d="M8 5v14l11-7z"/><path class="ico-stop" d="M7 7h10v10H7z"/></svg>
-        <span>Start</span>
       </button>
     </footer>
   </div>

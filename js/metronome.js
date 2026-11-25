@@ -17,7 +17,7 @@
     bpm: intIn(saved.bpm, M.MIN_BPM, M.MAX_BPM, 120),
     // nazwa wybrana z listy – pokazywana zamiast wyliczonej, aż do ręcznej zmiany tempa
     picked: M.TEMPOS.some((t) => t.name === saved.picked) ? saved.picked : null,
-    accent: intIn(saved.accent, 1, 8, 4),
+    accent: intIn(saved.accent, 0, 8, 4), // 0 = bez akcentu
     sub: intIn(saved.sub, 1, 16, 1),
   };
   const save = () => { try { localStorage.setItem(STORE, JSON.stringify(st)); } catch (e) { /* trudno */ } };
@@ -32,7 +32,6 @@
       // mikrofon stroika nie jest potrzebny – wyłączamy go jego własnym przyciskiem
       const mic = $('btn-mic');
       if (mic?.classList.contains('on')) mic.click();
-      scrollChipIntoView();
     } else {
       stop();
     }
@@ -83,26 +82,73 @@
   const weight = $('m-weight');
   const setAngle = (deg) => pendulum.setAttribute('transform', `rotate(${deg.toFixed(2)} ${PIVOT.x} ${PIVOT.y})`);
 
-  // ---------- lista temp ----------
-  const chips = $('tempo-chips');
-  chips.innerHTML = M.TEMPOS.map((t) =>
-    `<button class="chip" data-name="${t.name}" title="${t.meaning}: ${t.from}–${Math.min(t.to - 1, M.MAX_BPM)} BPM">${t.name}</button>`).join('');
-  chips.addEventListener('click', (e) => {
-    const b = e.target.closest('.chip');
-    if (!b) return;
-    const t = M.TEMPOS.find((x) => x.name === b.dataset.name);
-    setBpm(t.mid, t.name);
-  });
-  function scrollChipIntoView() {
-    const on = chips.querySelector('.chip.on');
-    if (!on || !chips.clientWidth) return;
-    chips.scrollTo({ left: on.offsetLeft - (chips.clientWidth - on.offsetWidth) / 2, behavior: 'smooth' });
+  // ---------- wybór tempa: lista rozwijana z wyszukiwaniem ----------
+  const pick = $('tempo-pick');
+  const tempoBtn = $('tempo-btn');
+  const pop = $('tempo-pop');
+  const search = $('tempo-search');
+  const list = $('tempo-list');
+  const top = (t) => (t.to === 25 ? 24 : Math.min(t.to, M.MAX_BPM)); // górna wartość jak w tabeli
+  const norm = (x) => x.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/ł/g, 'l');
+  let matches = [];
+  let hi = 0; // podświetlona pozycja (klawiatura)
+
+  function fillList() {
+    const q = norm(search.value.trim());
+    // najpierw nazwy zaczynające się od wpisanego tekstu, potem pozostałe trafienia
+    const starts = M.TEMPOS.filter((t) => norm(t.name).startsWith(q));
+    const rest = M.TEMPOS.filter((t) => !starts.includes(t) && (norm(t.name).includes(q) || norm(t.meaning).includes(q)));
+    matches = [...starts, ...rest];
+    hi = Math.min(hi, Math.max(0, matches.length - 1));
+    const current = $('tempo-name').textContent.split('/');
+    list.innerHTML = matches.length
+      ? matches.map((t, i) => `<li role="option" data-name="${t.name}" aria-selected="${current.includes(t.name)}" class="${i === hi ? 'hi' : ''}">
+          <b>${t.name}</b><span class="t-mean">${t.meaning}</span><span class="t-range">${t.from}–${top(t)}</span></li>`).join('')
+      : '<li class="empty">Brak takiego tempa</li>';
   }
+  function openPop() {
+    pop.hidden = false;
+    tempoBtn.setAttribute('aria-expanded', 'true');
+    search.value = '';
+    hi = Math.max(0, M.TEMPOS.findIndex((t) => t.name === $('tempo-name').textContent.split('/')[0]));
+    fillList();
+    list.querySelector('.hi')?.scrollIntoView({ block: 'center' });
+    search.focus();
+  }
+  function closePop() {
+    pop.hidden = true;
+    tempoBtn.setAttribute('aria-expanded', 'false');
+  }
+  function choose(name) {
+    const t = M.TEMPOS.find((x) => x.name === name);
+    if (t) setBpm(t.mid, t.name);
+    closePop();
+  }
+  tempoBtn.addEventListener('click', () => (pop.hidden ? openPop() : closePop()));
+  search.addEventListener('input', () => { hi = 0; fillList(); });
+  search.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      hi = (hi + (e.key === 'ArrowDown' ? 1 : -1) + matches.length) % Math.max(1, matches.length);
+      fillList();
+      list.querySelector('.hi')?.scrollIntoView({ block: 'nearest' });
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (matches[hi]) choose(matches[hi].name);
+    } else if (e.key === 'Escape') {
+      closePop(); tempoBtn.focus();
+    }
+  });
+  list.addEventListener('click', (e) => {
+    const li = e.target.closest('li[data-name]');
+    if (li) choose(li.dataset.name);
+  });
+  document.addEventListener('pointerdown', (e) => { if (!pop.hidden && !pick.contains(e.target)) closePop(); });
 
   // ---------- akcent i podział ----------
   const accentSeg = $('accent-seg');
-  accentSeg.innerHTML = Array.from({ length: 8 }, (_, i) =>
-    `<button role="radio" data-n="${i + 1}" aria-label="Akcent co ${i + 1}">${i + 1}</button>`).join('');
+  accentSeg.innerHTML = Array.from({ length: 9 }, (_, n) =>
+    `<button role="radio" data-n="${n}" aria-label="${n ? `Akcent co ${n}` : 'Bez akcentu'}">${n}</button>`).join('');
   accentSeg.addEventListener('click', (e) => {
     const b = e.target.closest('button[data-n]');
     if (!b) return;
@@ -117,9 +163,21 @@
     st.bpm = M.clampBpm(bpm);
     st.picked = picked;
     save(); render();
-    if (picked) scrollChipIntoView();
   }
   bpmRange.addEventListener('input', () => setBpm(+bpmRange.value));
+
+  // wpisywanie tempa z klawiatury: duża liczba BPM to pole tekstowe
+  const bpmInput = $('bpm-input');
+  bpmInput.addEventListener('focus', () => bpmInput.select());
+  bpmInput.addEventListener('input', () => { bpmInput.value = bpmInput.value.replace(/\D/g, ''); });
+  bpmInput.addEventListener('change', () => {
+    const v = parseInt(bpmInput.value, 10);
+    if (Number.isFinite(v)) setBpm(v); else render();
+  });
+  bpmInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') bpmInput.blur();
+    if (e.key === 'Escape') { bpmInput.value = st.bpm; bpmInput.blur(); }
+  });
 
   // przyciski −/+: stuknięcie = 1, przytrzymanie = szybkie powtarzanie
   function holdRepeat(btn, fn) {
@@ -143,9 +201,8 @@
   function render() {
     const names = st.picked ? [st.picked] : M.temposFor(st.bpm).map((t) => t.name);
     $('tempo-name').textContent = names.join('/');
-    $('bpm-val').textContent = st.bpm;
+    if (document.activeElement !== bpmInput) bpmInput.value = st.bpm;
     bpmRange.value = st.bpm;
-    chips.querySelectorAll('.chip').forEach((c) => c.classList.toggle('on', names.includes(c.dataset.name)));
     accentSeg.querySelectorAll('button').forEach((b) => {
       const on = +b.dataset.n === st.accent;
       b.classList.toggle('on', on);
@@ -155,8 +212,11 @@
     $('sub-note').textContent = st.sub === 1 ? 'bez podziału' : `${st.sub} ${plural(st.sub)}`;
     $('sub-minus').disabled = st.sub <= 1;
     $('sub-plus').disabled = st.sub >= 16;
-    if (dots.childElementCount !== st.accent) {
-      dots.innerHTML = Array.from({ length: st.accent }, (_, i) => `<i class="${i === 0 ? 'acc' : ''}"></i>`).join('');
+    // kropki: jedna na każde uderzenie w grupie akcentowej (bez akcentu – jedna zwykła)
+    const n = Math.max(1, st.accent);
+    if (dots.childElementCount !== n || dots.dataset.acc !== String(st.accent)) {
+      dots.dataset.acc = st.accent;
+      dots.innerHTML = Array.from({ length: n }, (_, i) => `<i class="${i === 0 && st.accent ? 'acc' : ''}"></i>`).join('');
     }
     const y = weightY(st.bpm);
     weight.setAttribute('d', `M133 ${y} L167 ${y} L172 ${y + 28} L128 ${y + 28} Z`);
@@ -198,7 +258,7 @@
     while (nextTime < ahead) {
       const dur = 60 / st.bpm;
       if (subIdx === 0) {
-        click(nextTime, beat % st.accent === 0 ? 'accent' : 'beat');
+        click(nextTime, st.accent && beat % st.accent === 0 ? 'accent' : 'beat');
         beats.push({ time: nextTime, n: beat, dur });
         if (beats.length > 8) beats.shift();
       } else {
@@ -221,7 +281,7 @@
     timer = setInterval(schedule, 25);
     pendulum.classList.remove('rest');
     btn.classList.add('on');
-    btn.querySelector('span').textContent = 'Stop';
+    btn.setAttribute('aria-label', 'Stop');
     try { wakeLock = await navigator.wakeLock?.request('screen'); } catch (e) { /* brak */ }
     requestAnimationFrame(frame);
   }
@@ -232,7 +292,7 @@
     try { wakeLock?.release(); } catch (e) { /* brak */ }
     wakeLock = null;
     btn.classList.remove('on');
-    btn.querySelector('span').textContent = 'Start';
+    btn.setAttribute('aria-label', 'Start');
     pendulum.classList.add('rest');
     setAngle(0);
     dots.querySelectorAll('i').forEach((d) => d.classList.remove('on'));
@@ -252,7 +312,7 @@
       // uderzenie = skrajne wychylenie; parzyste w prawo, nieparzyste w lewo
       const p = Math.min(1, (now - b.time) / b.dur);
       setAngle((b.n % 2 === 0 ? 1 : -1) * AMP * Math.cos(Math.PI * p));
-      const pos = b.n % st.accent;
+      const pos = st.accent ? b.n % st.accent : 0;
       const flash = now - b.time < 0.12;
       dots.querySelectorAll('i').forEach((d, i) => {
         d.classList.toggle('on', i === pos);
@@ -266,7 +326,7 @@
   btn.addEventListener('click', () => (playing ? stop() : start()));
   // spacja = start/stop (na komputerze)
   document.addEventListener('keydown', (e) => {
-    if (st.mode !== 'metro' || e.code !== 'Space' || e.target.closest('button, input')) return;
+    if (st.mode !== 'metro' || e.code !== 'Space' || e.target.closest('button, input, li')) return;
     e.preventDefault();
     playing ? stop() : start();
   });

@@ -214,8 +214,48 @@ body:not(.metro) .metro-only { display: none !important; }
 
 /* ---------- metronom ---------- */
 .metro { flex: 1; min-height: 0; display: flex; flex-direction: column; }
-.bpm { color: var(--muted); font-size: .95rem; }
-.bpm b { color: var(--gold); font-size: 1.6rem; font-variant-numeric: tabular-nums; }
+.metro-readout { padding-top: 6px; }
+/* tempo w BPM – najważniejsza informacja; pole do wpisania z klawiatury */
+.bpm-big { display: inline-flex; align-items: baseline; justify-content: center; gap: 6px; cursor: text; }
+.bpm-big input {
+  width: 3.2ch; padding: 0 2px; border: 0; border-bottom: 2px dashed rgba(232, 196, 122, .35); border-radius: 0;
+  background: transparent; color: var(--gold); text-align: center; outline: none;
+  font: 700 3.4rem/1 Georgia, "Times New Roman", serif; font-variant-numeric: tabular-nums;
+  user-select: text; -webkit-user-select: text;
+}
+.bpm-big input:focus { border-bottom: 2px solid var(--gold); background: rgba(232, 196, 122, .08); border-radius: 8px 8px 0 0; }
+.bpm-big span { color: var(--muted); font-size: 1rem; letter-spacing: .06em; }
+
+/* nazwa tempa – lista rozwijana z wyszukiwaniem */
+.tempo-pick { position: relative; display: inline-block; margin-top: 2px; }
+.tempo-btn {
+  display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px 5px 16px; border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, .18); background: var(--bg2); color: var(--ink);
+  font: 600 1.05rem Georgia, "Times New Roman", serif;
+}
+.tempo-btn svg { width: 18px; height: 18px; fill: none; stroke: var(--muted); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform .2s; }
+.tempo-btn[aria-expanded="true"] svg { transform: rotate(180deg); }
+.tempo-pop {
+  position: absolute; z-index: 50; top: calc(100% + 6px); left: 50%; transform: translateX(-50%);
+  width: min(340px, calc(100vw - 32px)); padding: 8px; border-radius: 14px; text-align: left;
+  background: var(--panel); border: 1px solid rgba(255, 255, 255, .16); box-shadow: 0 12px 30px rgba(0, 0, 0, .55);
+}
+.tempo-pop[hidden] { display: none; }
+.tempo-pop input {
+  width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, .2);
+  background: var(--bg2); color: var(--ink); font: inherit; outline: none; user-select: text; -webkit-user-select: text;
+}
+.tempo-pop input:focus { border-color: var(--accent2); }
+.tempo-pop ul { list-style: none; margin: 6px 0 0; padding: 0; max-height: min(300px, 45dvh); overflow-y: auto; }
+.tempo-pop li {
+  display: grid; grid-template-columns: 1fr auto; column-gap: 8px; padding: 8px 10px; border-radius: 8px; cursor: pointer;
+}
+.tempo-pop li b { font-family: Georgia, "Times New Roman", serif; }
+.tempo-pop .t-mean { grid-column: 1; color: var(--muted); font-size: .8rem; }
+.tempo-pop .t-range { grid-column: 2; grid-row: 1 / span 2; align-self: center; color: var(--gold); font-variant-numeric: tabular-nums; font-size: .9rem; }
+.tempo-pop li.hi { background: rgba(255, 255, 255, .08); }
+.tempo-pop li[aria-selected="true"] b { color: var(--active); }
+.tempo-pop li.empty { color: var(--muted); cursor: default; }
 .beat-dots { display: flex; justify-content: center; gap: 8px; height: 18px; align-items: center; margin-top: 4px; }
 .beat-dots i { width: 10px; height: 10px; border-radius: 50%; background: rgba(255, 255, 255, .18); transition: background .1s, transform .1s; }
 .beat-dots i.acc { width: 14px; height: 14px; }
@@ -251,12 +291,14 @@ body:not(.metro) .metro-only { display: none !important; }
 .btn:disabled { opacity: .35; }
 .sub-val { min-width: 2ch; text-align: center; color: var(--gold); font-size: 1.15rem; font-variant-numeric: tabular-nums; }
 .opt-note { color: var(--muted); font-size: .8rem; }
+.play-btn { width: 72px; height: 72px; padding: 0; border-radius: 50%; display: inline-grid; place-items: center; box-shadow: 0 6px 18px rgba(0, 0, 0, .35); }
+.play-btn svg { width: 34px; height: 34px; }
 #btn-metro .ico-stop { display: none; }
 #btn-metro.on .ico-play { display: none; }
 #btn-metro.on .ico-stop { display: inline; }
 #btn-metro svg path { fill: currentColor; stroke: none; }
 #btn-metro.on { background: var(--panel2); border: 1px solid var(--accent2); }
 @media (max-height: 640px) {
-  .metro .note { font-size: 1.7rem; }
-  .bpm b { font-size: 1.3rem; }
+  .bpm-big input { font-size: 2.6rem; }
+  .play-btn { width: 60px; height: 60px; }
 }

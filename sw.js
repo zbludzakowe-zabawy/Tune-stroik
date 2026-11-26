@@ -15,6 +15,7 @@ const ASSETS = [
   './js/pwa.js',
   './js/tempo.js',
   './js/metronome.js',
+  './js/share.js',
   './manifest.webmanifest',
   './icons/icon-192.png',
   './icons/icon-512.png',

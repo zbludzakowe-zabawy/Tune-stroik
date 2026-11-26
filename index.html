@@ -143,6 +143,10 @@
     </footer>
   </div>
 
+  <!-- dyskretny przycisk „Udostępnij” w prawym dolnym rogu (jak w Światełkach) -->
+  <button class="share-btn" type="button" data-share aria-label="Udostępnij aplikację" title="Udostępnij aplikację"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M18 5 6 12l12 7" fill="none" stroke="currentColor" stroke-width="2.2"/><circle cx="18" cy="5" r="3.2" fill="currentColor"/><circle cx="6" cy="12" r="3.2" fill="currentColor"/><circle cx="18" cy="19" r="3.2" fill="currentColor"/></svg></button>
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
   <dialog id="settings" class="sheet">
     <h2>Ustawienia</h2>
     <div class="field">
@@ -191,5 +195,6 @@
   <script src="js/pwa.js"></script>
   <script src="js/tempo.js"></script>
   <script src="js/metronome.js"></script>
+  <script src="js/share.js"></script>
 </body>
 </html>
